@@ -32,19 +32,43 @@ body {
     padding-top: 50px;
 }
 
-
+.display-error,
+.display-error:focus,
+.display-error:hover{
+    border: 0.1rem solid red;
+    color:red;
+}
+table{
+    margin:auto;
+}
+input,
+#recurrent-event-content{
+    text-align: center;
+    align-content: center;
+}
+#error-message,
+#error-message-end-repeat,
+.error-message-frequency{
+    color:red;
+    text-align: center;
+    font-weight: bold;
+}
 
 .card {
     padding-top: 10px;
     padding-bottom: 10px;
     margin: auto;
     border: none !important;
+    
 }
 .card button {
     width: 100%;
 }
 
-
+.correct-event{
+    border: 0.15rem solid green !important;
+    text-align: center;
+}
 
 input[type="text"]#event-name, input[type="text"]#event-location {
     border: none;
