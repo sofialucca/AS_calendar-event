@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="//code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
 	<link rel="stylesheet" type="text/css" href="external_js/jquery.timepicker.css" />
     
-
+<script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
     <script src="external_js/build/jquery.datetimepicker.full.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
@@ -21,11 +21,11 @@
     <script src="event-text.js"></script>
     <!-- <script src="create-recurring-event.js"></script> -->
     <!-- Remove this script to disable logging -->
-    <!--<script src="logging.js"></script> -->
+    <!-- <script src="logging.js"></script>-->
 </head>
 
 <body>
-<div id="container">
+<div id="container" >
 
     <div id="content">
     <div class="card col-lg-6">
@@ -37,24 +37,29 @@
 
         <table id="time-details" class = "hidden-beginning">
             <tr >
-                <td class="time-detail-name">all-day:</td>
-                <td class=""><input id="all-day-event-checkbox" type="checkbox"></td>
+                <!--
+                  <td class="time-detail-name">all-day:</td>  
+                -->
+                
+                <td colspan = "3" class="all-day-selector text-center px-2">
+                    <input id="all-day-event-checkbox" type="checkbox"><label for ="all-day-event-checkbox">All-day</label>
+                </td>
             </tr>
             <tr id="start-time-row">
-                <td class="time-detail-name">starts:</td>
-                <td class=""><input class="input-medium search-query" onkeypress="return false" id="event-start-date" type="text"></td>
-                <td class=""><input class="hidden-beginning input-medium search-query" onkeypress="return false" id="event-start-time" type="text"></td>
+                <td class="time-detail-name ">starts:</td>
+                <td class=""><input class="input-medium search-query" onkeypress="return false" id="event-start-date" type="text" placeholder="Start date"></td>
+                <td class=""><input class="hidden-beginning input-medium search-query" onkeypress="return false" id="event-start-time" type="text" placeholder="Start time"></td>
             </tr>
             
             <tr id="end-time-row">
                 <td class="time-detail-name">ends:</td>
-                <td class=""><input class="input-medium search-query" onkeypress="return false" id="event-end-date" type="text"></td>
-                <td class=""><input class="hidden input-medium search-query" onkeypress="return false" id="event-end-time" type="text"></td>
+                <td class=""><input class="input-medium search-query" onkeypress="return false" id="event-end-date" type="text" placeholder="End date"></td>
+                <td class=""><input class="hidden input-medium search-query" onkeypress="return false" id="event-end-time" type="text" placeholder="End time"></td>
             </tr>
 
             <tr id="all-day-event-row" class="hidden">
                 <td class="time-detail-name">date:</td>
-                <td class=""><input class="input-medium search-query" onkeypress="return false" id="all-day-event-date" type="text"></td>
+                <td class=""><input class="input-medium search-query" onkeypress="return false" id="all-day-event-date" type="text" placeholder = "Date"></td>
             </tr>
 
       
@@ -62,24 +67,32 @@
             <!-- Event Repeat Details -->
             <tr class ="hidden-beginning" id = "recurrent-event-row">
                 <td class="time-detail-name">repeat:</td>
-                <td >
-                    <select id="recurrent-event-type-selector">
-                        <option value="none" selected="selected">None</option>
-                        <option value="day">Every Day</option>
-                        <option value="week">Every Week</option>
-                        <option value="month">Every Month</option>
-                        <option value="year">Every Year</option>
-                        <option disabled="disabled"></option>
-                        <option value="custom">Custom...</option>
-                    </select>
-                </td>
+                
+                <td colspan="2">  
+                    <form class = "row" id = "form-recurrent-event-type" colspan="2">
+                      
+                        <div class = "col d-flex justify-content-around flex-column" class ="radio-recurrent">
+                    <input type="radio" name = "recurrent-event-type-selector" value = "none" checked = "checked" id = "none"/><label for="none">None</label>
+                    <input type="radio" name = "recurrent-event-type-selector" value = "day" id = "day"/><label for="day">Every Day</label>
+                    <input type="radio" name = "recurrent-event-type-selector" value = "week" id = "week" /><label for = "week">Every Week </label>                           
+                        </div>
+                        <div class = "col d-flex justify-content-around flex-column" class ="radio-recurrent">
+                            <input type="radio" name = "recurrent-event-type-selector" value = "month" id="month" /><label for = "month">Every Month</label>
+                            <input type="radio" name = "recurrent-event-type-selector" value = "year" id = "year" /><label for = "year">Every Year</label>
+                            <input type="radio" name = "recurrent-event-type-selector" value = "custom" id = "custom" /><label for = "custom">Custom</label>                            
+                        </div>
+
+                    </form>
+                </td>      
+               
+
             </tr>
             <tr id="recurrent-event-end-date-row" class="hidden hidden-beginning">
                 <td class="time-detail-name">end repeat:</td>
-                <td class=""><input class="input-medium search-query" onkeypress="return false" id="recurrent-event-end-date" type="text"></div></td>
+                <td class=""><input class="input-medium search-query" onkeypress="return false" id="recurrent-event-end-date" type="text" placeholder="End date"></div></td>
             </tr>
             <tr id = "error-message">
-                
+                <td></td>
                 <td colspan= '3' id="error-input-date-end">End date must be after start date</td>
                 
             </tr> 
@@ -264,11 +277,11 @@
     </div>
 
 
-    <div class="card col-lg-4">
+    <div class="card col-lg-4 ">
         <button id="create-event-button" class="hidden-beginning btn btn-secondary class " type="button">Create Event</button>
     </div>
 
-    <div id="new-event-text" class="card col-lg-4">
+    <div id="new-event-text" class=" card col-lg-4">
         
     </div>
     </div>

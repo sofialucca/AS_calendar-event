@@ -1,4 +1,3 @@
-
 let correctFinalDateTime = true;
 let wasEmpty = true;
 let allDayRepeatStatus = new RepeatEvent(false);
@@ -8,6 +7,7 @@ $(function () {
   $(function () {
     $("#event-name").focus();
     $(".hidden-beginning").hide();
+
   });
 
   $(document).on("input", "#event-name", function (e) {
@@ -23,11 +23,11 @@ $(function () {
         showAllDayEventOptions();
       } else {
         hideAllDayEventOptions();
-
       }
     } else if (e.target.value == "") {
       wasEmpty = true;
       $(".hidden-beginning").hide();
+      $(this).focus();
     }
   });
 
@@ -38,6 +38,7 @@ $(function () {
     gotoCurrent: true,
     hideIfNoPrevNext: true,
     minDate: new Date(),
+    value:new Date(),
   });
   $("#event-start-date").on("change", function ($input) {
     if ($input.target.value == "") {
@@ -48,76 +49,98 @@ $(function () {
       $("#recurrent-event-content").hide();
       hideCreateEventButton();
       $("#recurrent-event-end-date-row").hide();
+      $(this).focus();
     } else {
       $("#event-start-time").show();
+      
       let eventEndDate = document.getElementById("event-end-date");
 
-      if (eventEndDate.value) {
-        if (
-          new Date($input.target.value) >
-          $("#event-end-date").datepicker("getDate")
-        ) {
-          displayError();
+        if (eventEndDate.value) {
           $("#end-time-row").show();
-          $("event-end-time").hide();
-        } else if (
-          new Date($input.target.value) <
-          $("#event-end-date").datepicker("getDate")
-        ) {
-          removeError();
-          $("#event-end-time").timepicker("option", "minTime", "12:00 AM");
-          if ($("#event-end-time").timepicker("getTime")) {
-            $("#recurrent-event-row").show();
-            if ($("#recurrent-event-type-selector").val() != "none") {
-              $("#recurrent-event-end-date-row").show();
-              if (!moreDaysRepeatStatus.correct) {
-                displayErrorEndRepeat();
-              } else if (
-                $("#recurrent-event-end-date").val() &&
-                $("#recurrent-event-type-selector").val() == "custom"
-              ) {
-                showRecurrentEventOptions();
-              }
-            }
-          } else {
-            $("#recurrent-event-row").hide();
-          }
-        } else {
-          if ($("#event-end-time").timepicker("getTime")) {
-            if (
-              $("#event-end-time").timepicker("getTime") <
-              $("#event-start-time").timepicker("getTime")
-            ) {
-              displayError();
-              $("#event-end-time").show();
-              $("#recurrent-event-row").hide();
-              $("#recurrent-event-end-date-row").hide();
-              $("#recurrent-event-content").hide();
-              hideCreateEventButton();
-            } else {
-              removeError();
+          if (
+            new Date($input.target.value) >
+            $("#event-end-date").datepicker("getDate")
+          ) {
+            displayError("#event-start-date", "#event-end-date");
+            $("#end-time-row").show();
+            $("#event-end-time").hide();
+          } else if (
+            new Date($input.target.value) <
+            $("#event-end-date").datepicker("getDate")
+          ) {
+            removeError("#event-start-date");
+            $("#event-end-time").timepicker("option", "minTime", "12:00 AM");
+            if ($("#event-end-time").timepicker("getTime")) {
               $("#recurrent-event-row").show();
-              if ($("#recurrent-event-type-selector").val() != "none") {
+
+              if ($("#form-recurrent-event-type :checked").val() != "none") {
                 $("#recurrent-event-end-date-row").show();
                 if (!moreDaysRepeatStatus.correct) {
                   displayErrorEndRepeat();
                 } else if (
                   $("#recurrent-event-end-date").val() &&
-                  $("#recurrent-event-type-selector").val() == "custom"
+                  $("#form-recurrent-event-type :checked").val() == "custom"
                 ) {
                   showRecurrentEventOptions();
                 }
+              } else {
+                showCreateEventButton();
               }
+            } else {
+              $("#recurrent-event-row").hide();
+              
+            }
+          } else {
+            if ($("#event-end-time").timepicker("getTime")) {
+              if (
+                $("#event-end-time").timepicker("getTime") <
+                $("#event-start-time").timepicker("getTime")
+              ) {
+                displayError("#event-start-date", "event-end-time");
+                $("#event-end-time").show();
+                $("#recurrent-event-row").hide();
+                $("#recurrent-event-end-date-row").hide();
+                $("#recurrent-event-content").hide();
+                hideCreateEventButton();
+              } else {
+                removeError("#event-start-date");
+                $("#recurrent-event-row").show();
+                if ($("#form-recurrent-event-type :checked").val() != "none") {
+                  $("#recurrent-event-end-date-row").show();
+                  if (!moreDaysRepeatStatus.correct) {
+                    displayErrorEndRepeat();
+                  } else if (
+                    $("#recurrent-event-end-date").val() &&
+                    $("#form-recurrent-event-type :checked").val() == "custom"
+                  ) {
+                    showRecurrentEventOptions();
+                  } 
+                } else {
+                  showCreateEventButton();
+                }
+              }
+            } else {
+              removeError("#event-start-date");
+              $("#event-end-time").timepicker("option", "minTime", "12:00 AM");
+              $("#event-end-time").show();
+              $("#recurrent-event-row").hide();
+              
             }
           }
+        } else {
+          if ($("#event-start-time").val()) {
+            $("#end-time-row").show();
+
+            $("#event-end-time").hide();
+            $("#event-end-date").show();
+            
+          } 
+          $("#event-end-date").datepicker(
+            "option",
+            "minDate",
+            $input.target.value
+          );
         }
-      } else {
-        $("#event-end-date").datepicker(
-          "option",
-          "minDate",
-          $input.target.value
-        );
-      }
     }
   });
   $("#event-start-time")
@@ -134,22 +157,27 @@ $(function () {
         $("#recurrent-event-content").hide();
         hideCreateEventButton();
         $("#recurrent-event-end-date-row").hide();
+        $(this).focus();
       } else {
         $("#end-time-row").show();
-        $("#event-end-time").hide();
-        if ($("#event-start-date").val() == $("#event-end-date").val()) {
+        
+        
+        if (!$("#event-end-date").val()) {
+          $("#event-end-time").hide();
+        }else if($("#event-start-date").val() == $("#event-end-date").val()) {
           $("#event-end-time").timepicker(
             "option",
             "minTime",
             $input.target.value
           );
+          $("#event-end-time").show();
           if ($("#event-end-time").val()) {
             $("#event-end-time").show();
             if (
               $("#event-end-time").timepicker("getTime") <
               $("#event-start-time").timepicker("getTime")
             ) {
-              displayError();
+              displayError("#event-start-time", "event-end-time");
               $("#event-end-time").show();
               $("#recurrent-event-row").hide();
               $("#recurrent-event-end-date-row").hide();
@@ -160,21 +188,47 @@ $(function () {
                 $("#event-end-time").timepicker("getTime") >=
                 $("#event-start-time").timepicker("getTime")
               ) {
-                removeError();
+                removeError("#event-start-time");
               }
               $("#recurrent-event-row").show();
-              if ($("#recurrent-event-type-selector").val() != "none") {
+              if ($("#form-recurrent-event-type :checked").val() != "none") {
                 $("#recurrent-event-end-date-row").show();
                 if (!moreDaysRepeatStatus.correct) {
                   displayErrorEndRepeat();
                 } else if (
                   $("#recurrent-event-end-date").val() &&
-                  $("#recurrent-event-type-selector").val() == "custom"
+                  $("#form-recurrent-event-type :checked").val() == "custom"
                 ) {
                   showRecurrentEventOptions();
-                }
+                } 
+              }else{
+                showCreateEventButton();
               }
             }
+          }else{
+            $("#event-end-time").show();
+
+          }
+        }else if($("#event-start-date").val() < $("#event-end-date").val()) {
+          $("#event-end-time").show();
+          if ($("#event-end-time").val()) {
+              $("#recurrent-event-row").show();
+              if ($("#form-recurrent-event-type :checked").val() != "none") {
+                $("#recurrent-event-end-date-row").show();
+                if (!moreDaysRepeatStatus.correct) {
+                  displayErrorEndRepeat();
+                } else if (
+                  $("#recurrent-event-end-date").val() &&
+                  $("#form-recurrent-event-type :checked").val() == "custom"
+                ) {
+                  showRecurrentEventOptions();
+                } 
+              }else{
+                showCreateEventButton();
+              }
+          }else{
+            $("#event-end-time").show();
+
           }
         }
       }
@@ -208,66 +262,67 @@ $(function () {
         hideCreateEventButton();
         $("#recurrent-event-end-date-row").hide();
         $("#error-message-end-repeat").hide();
+        $(this).focus();
       } else {
         if ($("#event-start-date").val() == $("#event-end-date").val()) {
-          $("#event-end-time").timepicker(
-            "option",
-            "minTime",
-            $("#event-start-time").val()
-          );
-          if (
-            $("#event-end-time").timepicker("getTime") &&
-            $("#event-end-time").timepicker("getTime") <
-              $("#event-start-time").timepicker("getTime")
+            $("#event-end-time").timepicker(
+              "option",
+              "minTime",
+              $("#event-start-time").val()
+            );
+            if (
+              $("#event-end-time").timepicker("getTime") &&
+              $("#event-end-time").timepicker("getTime") <
+                $("#event-start-time").timepicker("getTime")
+            ) {
+              displayError("#event-end-date", "event-end-time");
+              $("#event-end-time").show();
+              $("#recurrent-event-row").hide();
+              $("#recurrent-event-end-date-row").hide();
+              $("#recurrent-event-content").hide();
+              hideCreateEventButton();
+            } else {
+              removeError("#event-end-date");
+              if ($("#event-end-time").timepicker("getTime")) {
+                $("#recurrent-event-row").show();
+                if ($("#form-recurrent-event-type :checked").val() != "none") {
+                  $("#recurrent-event-end-date-row").show();
+                  if (!moreDaysRepeatStatus.correct) {
+                    displayErrorEndRepeat();
+                  } else if (
+                    $("#recurrent-event-end-date").val() &&
+                    $("#form-recurrent-event-type :checked").val() == "custom"
+                  ) {
+                    showRecurrentEventOptions();
+                  }
+                }
+              } else {
+                $("#recurrent-event-row").hide();
+              }
+            }
+          } else if (
+            new Date($input.target.value) >
+            $("#event-start-date").datepicker("getDate")
           ) {
-            displayError();
-            $("#event-end-time").show();
-            $("#recurrent-event-row").hide();
-            $("#recurrent-event-end-date-row").hide();
-            $("#recurrent-event-content").hide();
-            hideCreateEventButton();
-          } else {
-            removeError();
+            removeError("#event-end-date");
+            $("#event-end-time").timepicker("option", "minTime", "12:00 AM");
             if ($("#event-end-time").timepicker("getTime")) {
               $("#recurrent-event-row").show();
-              if ($("#recurrent-event-type-selector").val() != "none") {
+              if ($("#form-recurrent-event-type :checked").val() != "none") {
                 $("#recurrent-event-end-date-row").show();
                 if (!moreDaysRepeatStatus.correct) {
                   displayErrorEndRepeat();
                 } else if (
                   $("#recurrent-event-end-date").val() &&
-                  $("#recurrent-event-type-selector").val() == "custom"
+                  $("#form-recurrent-event-type :checked").val() == "custom"
                 ) {
                   showRecurrentEventOptions();
-                }
+                } 
               }
             } else {
               $("#recurrent-event-row").hide();
             }
           }
-        } else if (
-          new Date($input.target.value) >
-          $("#event-start-date").datepicker("getDate")
-        ) {
-          removeError();
-          $("#event-end-time").timepicker("option", "minTime", "12:00 AM");
-          if ($("#event-end-time").timepicker("getTime")) {
-            $("#recurrent-event-row").show();
-            if ($("#recurrent-event-type-selector").val() != "none") {
-              $("#recurrent-event-end-date-row").show();
-              if (!moreDaysRepeatStatus.correct) {
-                displayErrorEndRepeat();
-              } else if (
-                $("#recurrent-event-end-date").val() &&
-                $("#recurrent-event-type-selector").val() == "custom"
-              ) {
-                showRecurrentEventOptions();
-              }
-            }
-          } else {
-            $("#recurrent-event-row").hide();
-          }
-        }
 
         //check end repeat
         let eventEndDate = document.getElementById("recurrent-event-end-date");
@@ -277,10 +332,13 @@ $(function () {
               new Date($input.target.value) >
               $("#recurrent-event-end-date").datepicker("getDate")
             ) {
-              displayErrorEndRepeat();
+              displayErrorEndRepeat("#event-end-date");
               moreDaysRepeatStatus.correct = false;
             } else {
-              removeErrorEndRepeat($("#event-end-date").datepicker("getDate"));
+              removeErrorEndRepeat(
+                $("#event-end-date").datepicker("getDate"),
+                "#event-end-date"
+              );
               moreDaysRepeatStatus.minDateCurrent =
                 $("#event-end-date").datepicker("getDate");
               moreDaysRepeatStatus.correct = true;
@@ -295,13 +353,13 @@ $(function () {
             moreDaysRepeatStatus.correct = true;
           }
         }
-        if (!eventEndDate.value){
-                      $("#recurrent-event-end-date").datepicker(
-                        "option",
-                        "minDate",
-                        $input.target.value
-                      );
-        } 
+        if (!eventEndDate.value) {
+          $("#recurrent-event-end-date").datepicker(
+            "option",
+            "minDate",
+            $input.target.value
+          );
+        }
       }
     });
 
@@ -313,49 +371,51 @@ $(function () {
     })
     .on("change", function ($input) {
       if ($input.target.value == "") {
-        removeError();
+        removeError("#event-start-time");
         $("#recurrent-event-row").hide();
         $("#recurrent-event-content").hide();
         $("#recurrent-event-end-date-row").hide();
         hideCreateEventButton();
+        $(this).focus();
       } else if (
         $("#event-start-date").val() == $("#event-end-date").val() &&
         $("#event-end-time").timepicker("getTime") <
           $("#event-start-time").timepicker("getTime")
       ) {
-        displayError();
+        /*
+        displayError("#event-end-time","event-start-time");
         $(this).show();
         $("#recurrent-event-row").hide();
         $("#recurrent-event-end-date-row").hide();
         $("#recurrent-event-content").hide();
-        hideCreateEventButton();
+        hideCreateEventButton();*/
       } else {
         if (
           $("#event-start-date").val() == $("#event-end-date").val() &&
           $("#event-end-time").timepicker("getTime") >=
             $("#event-start-time").timepicker("getTime")
         ) {
-          removeError();
+          removeError("#event-start-time");
         }
         if ($("#event-end-time").timepicker("getTime")) {
           $("#recurrent-event-row").show();
-          if ($("#recurrent-event-type-selector").val() != "none") {
+          if ($("#form-recurrent-event-type :checked").val() != "none") {
             $("#recurrent-event-end-date-row").show();
             if (!moreDaysRepeatStatus.correct) {
               displayErrorEndRepeat();
             } else if (
               $("#recurrent-event-end-date").val() &&
-              $("#recurrent-event-type-selector").val() == "custom"
+              $("#form-recurrent-event-type :checked").val() == "custom"
             ) {
               showRecurrentEventOptions();
-            }
-          }else{
+            } 
+          } else {
+            $("#recurrent-event-end-date-row").hide();
             showCreateEventButton();
           }
         } else {
           $("#recurrent-event-row").hide();
         }
-
       }
     });
 
@@ -378,9 +438,10 @@ $(function () {
       } else {
         $("#recurrent-event-row").show();
         let eventEndDate = document.getElementById("recurrent-event-end-date");
-        if ($("#recurrent-event-type-selector").val() != "none") {
+        if ($("#form-recurrent-event-type :checked").val() != "none") {
           $("#recurrent-event-end-date-row").show();
-        }else{
+        } else {
+          $("#recurrent-event-end-date-row").hide();
           showCreateEventButton();
         }
         if (eventEndDate.value && allDayRepeatStatus.type != "none") {
@@ -388,11 +449,12 @@ $(function () {
             new Date($input.target.value) >
             $("#recurrent-event-end-date").datepicker("getDate")
           ) {
-            displayErrorEndRepeat();
+            displayErrorEndRepeat("#all-day-event-date");
             allDayRepeatStatus.correct = false;
           } else {
             removeErrorEndRepeat(
-              $("#all-day-event-date").datepicker("getDate")
+              $("#all-day-event-date").datepicker("getDate"),
+              "#all-day-event-date"
             );
             allDayRepeatStatus.minDateCurrent = $(
               "#all-day-event-date"
@@ -400,16 +462,15 @@ $(function () {
             allDayRepeatStatus.correct = true;
           }
         } else {
-          $("#recurrent-event-end-date").datepicker(
-            "option",
-            "minDate",
-            $input.target.value
-          );
+
+            $("#recurrent-event-end-date").datepicker(
+              "option",
+              "minDate",
+              $input.target.value
+            );
           allDayRepeatStatus.minDateCurrent = $input.target.value;
           allDayRepeatStatus.correct = true;
         }
-
-        
       }
     });
 
@@ -417,30 +478,33 @@ $(function () {
     if (this.checked) {
       allDayRepeatStatus.active = true;
       moreDaysRepeatStatus.active = false;
-      showAllDayEventOptions();
+      showAllDayEventOptions(true);
     } else {
       allDayRepeatStatus.active = false;
       moreDaysRepeatStatus.active = true;
-      hideAllDayEventOptions();
+      hideAllDayEventOptions(true);
     }
   });
 
-  $("#recurrent-event-type-selector").on("change", function () {
-    var val = $("#recurrent-event-type-selector option:selected").val();
+  $("#form-recurrent-event-type").on("change", function () {
+    var val = $("#form-recurrent-event-type :checked").val();
+    
     if (allDayRepeatStatus.active) {
       allDayRepeatStatus.type = val;
     } else {
       moreDaysRepeatStatus.type = val;
     }
     if (val == "none") {
+
       hideRecurrentEventEndDetails();
       showCreateEventButton();
     } else {
       hideCreateEventButton();
       showRecurrentEventEndDetails();
-      
     }
   });
+
+
 
   $("#recurrent-event-end-date")
     .datepicker({
@@ -453,6 +517,7 @@ $(function () {
     })
     .on("change", function ($input) {
       let current;
+
       if (allDayRepeatStatus.active) {
         allDayRepeatStatus.endDate = $input.target.value;
         current = $("#all-day-event-date").datepicker("getDate");
@@ -463,16 +528,18 @@ $(function () {
       if ($input.target.value == "") {
         hideRecurrentDetails();
       } else {
-        if (new Date($input.target.value) < current) {
-          displayErrorEndRepeat();
+        /*if (new Date($input.target.value) < current) {
+          //displayErrorEndRepeat("#recurrent-event-end-date",nameCurrent);
           hideRecurrentDetails();
           if (allDayRepeatStatus.active) {
             allDayRepeatStatus.correct = false;
           } else {
             moreDaysRepeatStatus.correct = false;
           }
-        } else {
-          removeErrorEndRepeat(current);
+        } else {*/
+
+        if (new Date($input.target.value) >= current) {
+          removeErrorEndRepeat(current, "#recurrent-event-end-date");
           if (allDayRepeatStatus.active) {
             allDayRepeatStatus.correct = true;
             allDayRepeatStatus.minDateCurrent = current;
@@ -481,17 +548,17 @@ $(function () {
 
             moreDaysRepeatStatus.minDateCurrent = current;
           }
-        }
-        if ($("#recurrent-event-type-selector").val() == "custom") {
-          showRecurrentEventOptions();
-        } else {
-          showCreateEventButton();
+          if ($("#form-recurrent-event-type :checked").val() == "custom") {
+            showRecurrentEventOptions();
+          } else {
+            showCreateEventButton();
+          }
         }
       }
     });
 
   $("#recurrent-event-time-selector").on("change", function () {
-    var val = $("#recurrent-event-time-selector option:selected").val();
+    let val = $("#recurrent-event-time-selector").val();
     hideRecurrentEventDetails();
     if (allDayRepeatStatus.active) {
       allDayRepeatStatus.setNewFreqType(val);
@@ -542,6 +609,15 @@ $(function () {
     );
     if ($input.target.value == "") {
       frequencyRepeat.classList.add("display-error");
+        $(
+          "#" + $("#recurrent-event-time-selector").val() + "-recurrent-freq"
+        ).trigger("log", [
+          "error-display",
+          {
+            typeError: "frequency-value",
+            typeValue: "",
+          },
+        ]);
     }
     $("error-message-frequency").hide();
   });
@@ -552,7 +628,7 @@ $(function () {
 
     if (val.length > 0) {
       if (!/^([1-9]|([1-2]?[0-9]{2})|(3(([0-5]\d)|6[0-5])))$/.test(val)) {
-        showErrorFrequency($("#daily-freq-error"));
+        displayErrorFrequency($("#daily-freq-error"));
         newVal = "";
       } else {
         hideErrorFrequency($("#daily-freq-error"));
@@ -573,7 +649,7 @@ $(function () {
 
     if (val.length > 0) {
       if (!/^([1-9]|[1-4]\d|5[0-3])$/.test(val)) {
-        showErrorFrequency($("#weekly-freq-error"));
+        displayErrorFrequency($("#weekly-freq-error"));
         newVal = "";
       } else {
         hideErrorFrequency($("#weekly-freq-error"));
@@ -593,7 +669,7 @@ $(function () {
 
     if (val.length > 0) {
       if (!/^([1-9]|1[0-2])$/.test(val)) {
-        showErrorFrequency($("#monthly-freq-error"));
+        displayErrorFrequency($("#monthly-freq-error"));
         newVal = "";
       } else {
         hideErrorFrequency($("#monthly-freq-error"));
@@ -613,7 +689,7 @@ $(function () {
 
     if (val.length > 0) {
       if (!/^([1-9]|\d{2})$/.test(val)) {
-        showErrorFrequency($("#yearly-freq-error"));
+        displayErrorFrequency($("#yearly-freq-error"));
         newVal = "";
       } else {
         hideErrorFrequency($("#yearly-freq-error"));
@@ -627,12 +703,13 @@ $(function () {
     }
   });
 
-
-
   $("[class$='-checkbox']").on("click", function () {
     let val = this.id;
 
-    if ($("#" + $("#recurrent-event-time-selector").val() + "-recurrent-freq")[0].className == ""){
+    if (
+      $("#" + $("#recurrent-event-time-selector").val() + "-recurrent-freq")[0]
+        .className == ""
+    ) {
       if (
         $(
           "#" +
@@ -647,7 +724,7 @@ $(function () {
         ).val()
       ) {
         showCreateEventButton();
-      }      
+      }
     }
 
     if (this.checked) {
@@ -665,18 +742,26 @@ $(function () {
     }
   });
 
-
   $("#event-name").focus();
 });
 
 // Functions to reset recurrent event interface
-function showErrorFrequency(errorDiv) {
+function displayErrorFrequency(errorDiv) {
   let frequencyRepeat = document.getElementById(
     $("#recurrent-event-time-selector").val() + "-recurrent-freq"
   );
   frequencyRepeat.classList.add("display-error");
   errorDiv.show();
   hideCreateEventButton();
+  $(
+    "#" + $("#recurrent-event-time-selector").val() + "-recurrent-freq"
+  ).trigger("log", [
+    "error-display",
+    {
+      typeError: "frequency-value",
+      typeValue: frequencyRepeat.textContent,
+    },
+  ]);
 }
 function hideErrorFrequency(errorDiv) {
   let frequencyRepeat = document.getElementById(
@@ -684,19 +769,27 @@ function hideErrorFrequency(errorDiv) {
   );
   frequencyRepeat.classList.remove("display-error");
   errorDiv.hide();
-      if ($("#recurrent-event-time-selector").val() == "daily") {
-        showCreateEventButton();
-      } else {
-        if (
-          $(
-            "#" +
-              $("#recurrent-event-time-selector").val() +
-              "-recurrent-details [class$='-checkbox']:checked"
-          ).length > 0
-        ) {
-          showCreateEventButton();
-        }
-      }
+  if ($("#recurrent-event-time-selector").val() == "daily") {
+    showCreateEventButton();
+  } else {
+    if (
+      $(
+        "#" +
+          $("#recurrent-event-time-selector").val() +
+          "-recurrent-details [class$='-checkbox']:checked"
+      ).length > 0
+    ) {
+      showCreateEventButton();
+    }
+  }
+    $(
+      "#" + $("#recurrent-event-time-selector").val() + "-recurrent-freq"
+    ).trigger("log", [
+      "error-removal",
+      {
+        typeError: "frequency-value",
+      },
+    ]);
 }
 function hideRecurrentEventDetails() {
   $("#daily-recurrent-details").hide();
@@ -772,8 +865,10 @@ function showAllDayEventOptions() {
     "minDate",
     allDayRepeatStatus.minDateCurrent
   );
+$("#form-recurrent-event-type :checked").prop("checked", false);
 
-  $("#recurrent-event-type-selector").val(allDayRepeatStatus.type);
+   $("#"+allDayRepeatStatus.type).prop('checked',true);
+
   $("#recurrent-event-end-date").val(allDayRepeatStatus.endDate);
 
   $("#recurrent-event-time-selector").val(allDayRepeatStatus.frequencyType);
@@ -789,18 +884,18 @@ function showAllDayEventOptions() {
 
   if ($("#all-day-event-date").val()) {
     $("#recurrent-event-row").show();
-    if ($("#recurrent-event-type-selector").val() != "none") {
+    if ($("#form-recurrent-event-type :checked").val() != "none") {
       $("#recurrent-event-end-date-row").show();
 
       if (
         $("#recurrent-event-end-date").val() &&
-        $("#recurrent-event-type-selector").val() == "custom"
+        $("#form-recurrent-event-type :checked").val() == "custom"
       ) {
         showRecurrentEventOptions();
       }
-      if (!allDayRepeatStatus.correct) {
-        displayErrorEndRepeat();
-      }
+        if (!allDayRepeatStatus.correct) {
+          displayErrorEndRepeat();
+        }
     }
   }
 }
@@ -808,7 +903,7 @@ function hideAllDayEventOptions() {
   resetAllRecurrentEventDetails();
   hideRecurrentDetails();
   removeErrorEndRepeat(moreDaysRepeatStatus.minDateCurrent);
-    hideCreateEventButton();
+  hideCreateEventButton();
   $("#all-day-event-row").hide();
   $("#start-time-row").show();
   $("#recurrent-event-row").hide();
@@ -821,12 +916,14 @@ function hideAllDayEventOptions() {
     "minDate",
     moreDaysRepeatStatus.minDateCurrent
   );
-  $("#recurrent-event-type-selector").val(moreDaysRepeatStatus.type);
+$("#form-recurrent-event-type :checked").prop("checked", false);  
+  $("#"+moreDaysRepeatStatus.type).prop('checked',true);
   $("#recurrent-event-end-date").val(moreDaysRepeatStatus.endDate);
   $("#recurrent-event-time-selector").val(moreDaysRepeatStatus.frequencyType);
   $("#" + moreDaysRepeatStatus.frequencyType + "-recurrent-freq").val(
     moreDaysRepeatStatus.frequency
   );
+  
   moreDaysRepeatStatus.selected.forEach((e) =>
     $("#" + e).prop("checked", true)
   );
@@ -842,13 +939,13 @@ function hideAllDayEventOptions() {
         if ($("#event-end-time").val()) {
           $("#event-end-time").show();
           $("#recurrent-event-row").show();
-          if ($("#recurrent-event-type-selector").val() != "none") {
+          if ($("#form-recurrent-event-type :checked").val() != "none") {
             $("#recurrent-event-end-date-row").show();
             if (!moreDaysRepeatStatus.correct) {
               displayErrorEndRepeat();
             } else if (
               $("#recurrent-event-end-date").val() &&
-              $("#recurrent-event-type-selector").val() == "custom"
+              $("#form-recurrent-event-type :checked").val() == "custom"
             ) {
               showRecurrentEventOptions();
             }
@@ -857,23 +954,25 @@ function hideAllDayEventOptions() {
           $("#recurrent-event-row").hide();
         }
       }
-
-      if (!correctFinalDateTime) {
-        $("#error-message").show();
-        if (document.getElementById("event-end-time").classList.length < 2)
-          $("#event-end-time").show();
-      }
+        if (!correctFinalDateTime) {
+          $("#error-message").show();
+          if (document.getElementById("event-end-time").classList.length < 2)
+            $("#event-end-time").show();
+        }
     }
   }
 }
 function showRecurrentEventEndDetails() {
   $("#recurrent-event-end-date-row").show();
-
-  if ($("#recurrent-event-type-selector").val() == "custom") {
-    if ($("#recurrent-event-end-date").val()) {
-      showRecurrentEventOptions();
+  let currentState = allDayRepeatStatus.active ? allDayRepeatStatus : moreDaysRepeatStatus;
+    if ($("#recurrent-event-end-date").val() && currentState.correct) {
+      if ($("#form-recurrent-event-type :checked").val() == "custom") {
+        showRecurrentEventOptions();
+      } else {
+        showCreateEventButton();
+      }
     }
-  } else {
+  if ($("#form-recurrent-event-type :checked").val() != "custom") {
     $("#recurrent-event-content").hide();
   }
 }
@@ -887,7 +986,7 @@ function hideRecurrentDetails() {
   hideRecurrentEventDetails();
   hideCreateEventButton();
 }
-function displayError() {
+function displayError(trigger, problemTrigger) {
   let eventEndDate = document.getElementById("event-end-date");
   let eventEndTime = document.getElementById("event-end-time");
   $("#error-message").show();
@@ -901,9 +1000,16 @@ function displayError() {
   $("#recurrent-event-end-date-row").hide();
   $("#error-message-end-repeat").hide();
   hideCreateEventButton();
+  $(trigger).trigger("log", [
+    "error-display",
+    {
+      problem: problemTrigger,
+      typeError: "end-date-time",
+    },
+  ]);
 }
 
-function removeError() {
+function removeError(trigger) {
   let eventEndDate = document.getElementById("event-end-date");
   let eventEndTime = document.getElementById("event-end-time");
   $("#event-end-date").datepicker(
@@ -916,25 +1022,50 @@ function removeError() {
   eventEndDate.classList.remove("display-error");
   $("#event-end-time").show();
   correctFinalDateTime = true;
+  $(trigger).trigger("log", [
+    "error-removal",
+    {
+      typeError: "end-date-time",
+    },
+  ]);
 }
 
-function displayErrorEndRepeat() {
+function displayErrorEndRepeat(trigger) {
   let eventEndDate = document.getElementById("recurrent-event-end-date");
   $("#error-message-end-repeat").show();
 
   eventEndDate.classList.add("display-error");
   $("#recurrent-event-content").hide();
   hideCreateEventButton();
+  if (trigger) {
+    $(trigger).trigger("log", [
+      "error-display",
+      {
+        problem: "recurrent-event-end-date",
+        typeError: "end-recurrent-date",
+      },
+    ]);
+  }
 }
 
-function removeErrorEndRepeat(newMin) {
+function removeErrorEndRepeat(newMin, trigger) {
   let eventEndDate = document.getElementById("recurrent-event-end-date");
   $("#recurrent-event-end-date").datepicker("option", "minDate", newMin);
   $("#error-message-end-repeat").hide();
   eventEndDate.classList.remove("display-error");
   $("#event-end-time").show();
-  if ($("#recurrent-event-type-selector").val() == "custom") {
+  if ($("#form-recurrent-event-type :checked").val() == "custom") {
     showRecurrentEventOptions();
+  }else{
+    showCreateEventButton();
+  }
+  if (trigger) {
+    $(trigger).trigger("log", [
+      "error-removal",
+      {
+        typeError: "end-recurrent-date",
+      },
+    ]);
   }
 }
 
@@ -973,7 +1104,6 @@ function RepeatEvent(active) {
     this.selected.sort();
   };
 
-
   this.setNewFreqType = function (newType) {
     let done = false;
 
@@ -1000,6 +1130,5 @@ function RepeatEvent(active) {
       this.frequency = 1;
     }
     this.frequencyType = newType;
-
   };
 }

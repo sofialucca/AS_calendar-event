@@ -23,8 +23,16 @@
     font: 18pt Helvetica;
 }
 
+body,
+#content,
+#container{
+    min-height: 100vh;
+}
 
-
+.info-event{
+    font-weight: bold;
+    
+}
 body {
     font: 12pt Helvetica;
 }
@@ -65,9 +73,14 @@ input,
     width: 100%;
 }
 
-.correct-event{
+.correct-event {
     border: 0.15rem solid green !important;
+    align-content: center;
+    
+}
+.correct-event div{
     text-align: center;
+    margin:auto
 }
 
 input[type="text"]#event-name, input[type="text"]#event-location {
@@ -94,7 +107,7 @@ input[type="text"].title {
     padding-right: 15px;
 }
 .time-detail-name {
-    text-align: right;
+    text-align: center;
 }
 #time-details tr td:nth-child(1) {
     width: 125px;
@@ -123,7 +136,7 @@ input[type="text"].title {
     text-align: center;
     cursor: pointer;
 }
-.month-checkbox-selector input[type=checkbox] + label {
+.month-checkbox-selector input[type=checkbox] + label{
     display: inline-block;
     border-radius: 6px;
     background: #dddddd;
@@ -138,3 +151,31 @@ input[type="text"].title {
     background: #2AD705;
     color: #ffffff;
 }
+#form-recurrent-event-type input[type=radio],
+.all-day-selector input[type=checkbox]{
+   display: none!important; 
+   
+}
+
+.radio-recurrent input[type=radio],
+#form-recurrent-event-type label,
+.all-day-selector input[type=checkbox] + label
+{
+  display: inline-block;
+  border-radius: 6px;
+  background: #dddddd;
+  height: 40px;
+  /*width: 30px;*/
+  margin-right: 3px;
+  line-height: 40px;
+  text-align: center;
+  cursor: pointer;
+  
+}
+
+#form-recurrent-event-type :checked+label,
+.all-day-selector input[type=checkbox]:checked + label {
+  background: #2AD705;
+  color: #ffffff;
+}
+

@@ -1,33 +1,50 @@
-// For simplicity this calendar has no backend.
+// For simplicity this calendar has no backend.logEvent
 // An event is displayed as a sentence below the event creation dialogue
 // with the details of the event in readable English.
 
 /////////////////////////////////////////////////////////////////////////////
 // New Event Creation
 /////////////////////////////////////////////////////////////////////////////
-
+//const dayjs = require("dayjs");
+let spanString = "<u class = 'info-event font-weight-bold'>";
+let errorType = {};
 $(function () {
   $("#create-event-button").click(function () {
     if (checkInputs()) {
       writeEventToScreen(getEventText(), "correct-event", "display-error");
+      let keyValues = {
+        allday: $("#all-day-event-checkbox")[0].checked,
+        typeRecurrency: $("#form-recurrent-event-type :checked").val(),
+      };
+          if ($("#form-recurrent-event-type :checked").val() == "custom") {
+              keyValues.frequencyRecurrency = $(
+                "#recurrent-event-time-selector"
+              ).val();
+          }      
+      $("#create-event-button").trigger("log", [
+        "display-event-created",
+        keyValues
+      ]);
+
       correctFinalDateTime = true;
       wasEmpty = true;
       allDayRepeatStatus = new RepeatEvent(false);
       moreDaysRepeatStatus = new RepeatEvent(true);
       $("input").val("");
       resetAllRecurrentEventDetails();
-      $("#recurrent-event-type-selector").val("none");
+      $("#form-recurrent-event-type :checked").val("none");
       $("#all-day-event-checkbox").prop("checked", false);
 
       $(".hidden-beginning").hide();
       $("#event-name").focus();
+      
     }
   });
 });
 
 // End time must come after start time
 function isValidEndTime() {
-  //console.log($("#all-day-event-checkbox").is(":checked"));
+
   if (!$("#all-day-event-checkbox").is(":checked")) {
     if (
       $("#event-start-date").datepicker("getDate") >
@@ -49,12 +66,13 @@ function isValidEndTime() {
   return true;
 }
 function checkInputs() {
-  if (document.querySelector("#event-name").textContent == "") {
+  if ($("#event-name").val() == "") {
     writeEventToScreen(
       "Need a name for the event",
       "display-error",
       "correct-event"
     );
+    return false;
   }
   if (!isValidEndTime()) {
     writeEventToScreen(
@@ -196,125 +214,174 @@ function getYearlyRepeatingMonths() {
 }
 
 function getWeeklyRepeatingString(arr) {
-  var eventString = "on every ";
+  var eventString = "on every&nbsp;";
   for (i = 0; i < arr.length - 1; i++) {
-    eventString += arr[i] + ", ";
+    eventString += spanString + arr[i] + "</u>,&nbsp;";
   }
   if (arr.length > 1) {
-    eventString += "and ";
+    eventString += "and&nbsp;";
   }
-  eventString += arr[arr.length - 1] + " of the week ";
+  eventString += spanString + arr[arr.length - 1] + "</u>&nbsp;of the week ";
   return eventString;
 }
 function getMonthlyRepeatingString(arr) {
-  var eventString = "on the ";
+  var eventString = "on the&nbsp;";
   for (i = 0; i < arr.length - 1; i++) {
-    eventString += arr[i] + ", ";
+    eventString += spanString + arr[i] + "</u>,&nbsp;";
   }
   if (arr.length > 1) {
-    eventString += "and ";
+    eventString += "and&nbsp;";
   }
-  eventString += arr[arr.length - 1] + " of the month ";
+  eventString += spanString + arr[arr.length - 1] + "</u>&nbsp;of the month ";
   return eventString;
 }
 function getYearlyRepeatingString(arr) {
-  var eventString = "in ";
+  var eventString = "in&nbsp;";
   for (i = 0; i < arr.length - 1; i++) {
-    eventString += arr[i] + ", ";
+    eventString += spanString + arr[i] + "</u>,&nbsp;";
   }
   if (arr.length > 1) {
-    eventString += "and ";
+    eventString += "and&nbsp;";
   }
-  eventString += arr[arr.length - 1] + " on the corresponding day of the month";
+  eventString +=
+    spanString +
+    arr[arr.length - 1] +
+    "</u>&nbsp;on the corresponding day of the month";
   if (arr.length > 1) {
     eventString += "s";
   }
-  eventString += " ";
+  eventString += "&nbsp;";
   return eventString;
 }
 
 function getEventText() {
   var eventName = $("#event-name").val();
   var eventLocation = $("#event-location").val();
-  console.log($("#event-location").val());
 
-  var eventString = "Event created: " + eventName;
+
+  var eventString =
+    "<div class = 'row text-center justify-content-center'>Event created:&nbsp;" +
+    spanString +
+    eventName +
+    "</u></div>";
   if (eventLocation != "") {
-    eventString += "<br/>Location: " + eventLocation;
+    eventString +=
+      "<div class = 'pt-3 row text-center justify-content-center'>Location:&nbsp;" +
+      spanString +
+      eventLocation +
+      "</u></div>";
   }
 
   var allDayEvent = $("#all-day-event-checkbox").is(":checked");
   if (allDayEvent) {
-    var eventDate = $("#all-day-event-date").val();
-    eventString += "<br/>An all day event on " + eventDate;
+    var eventDate = 	dayjs($("#all-day-event-date").val()).format("MMMM D, YYYY");
+    eventString +=
+      "<div class = 'pt-3 row text-center justify-content-center'>An all day event on&nbsp;" +
+      spanString +
+      eventDate +
+      "</u></div>";
   } else {
-    var startDate = $("#event-start-date").val();
+    var startDate = dayjs($("#event-start-date").val()).format("MMMM D, YYYY");
     var startTime = $("#event-start-time").val();
-    var endDate = $("#event-end-date").val();
+    var endDate = dayjs($("#event-end-date").val()).format("MMMM D, YYYY");
     var endTime = $("#event-end-time").val();
     var eventDate =
-      "Starting on " + startDate + " at " + startTime + " and ending";
+      "Starting on&nbsp;" +
+      spanString +
+      startDate +
+      "</u>&nbsp;at&nbsp;" +
+      spanString +
+      startTime +
+      "</u>&nbsp;and ending";
     if (startDate != endDate) {
-      eventDate += " on " + endDate;
+      eventDate += " on&nbsp;" + spanString + endDate + "</u>";
     }
-    eventDate += " at " + endTime;
-    eventString += "<br/>" + eventDate;
+    eventDate += "&nbsp;at&nbsp;" + spanString + endTime + "</u></div>";
+    eventString +=
+      "<div class = 'pt-3 row text-center justify-content-center'>" + eventDate;
   }
   var repetitionString = "";
-  var repeatOption = $("#recurrent-event-type-selector").val();
+  var repeatOption = $("#form-recurrent-event-type :checked").val();
   if (repeatOption == "none") {
     return eventString;
   } else if (repeatOption == "day") {
-    repetitionString += "Repeating every day ";
+    repetitionString +=
+      "Repeating every&nbsp;" + spanString + " day" + "</u>&nbsp;";
   } else if (repeatOption == "week") {
-    repetitionString += "Repeating every week ";
+    repetitionString +=
+      "Repeating every&nbsp;" + spanString + " week" + "</u>&nbsp;";
   } else if (repeatOption == "month") {
-    repetitionString += "Repeating every month ";
+    repetitionString +=
+      "Repeating every&nbsp;" + spanString + " month" + "</u>&nbsp;";
   } else if (repeatOption == "year") {
-    repetitionString += "Repeating every year ";
+    repetitionString +=
+      "Repeating every&nbsp;" + spanString + " year" + "</u>&nbsp;";
   } else {
     // custom
     var frequencyOption = $("#recurrent-event-time-selector").val();
     var frequency = 1;
     var repeatingUnits = [];
+    repetitionString += "Repeating every&nbsp;";
     if (frequencyOption == "daily") {
       frequency = $("#daily-recurrent-freq").val();
-      repetitionString += "Repeating every " + frequency + " day";
-      if (frequency > 1) {
-        repetitionString += "s";
+      
+      if (frequency == 1) {
+        repetitionString += spanString + "day";
+      }else{
+        repetitionString += spanString + frequency + " days";
       }
-      repetitionString += " ";
+      repetitionString += "</u>&nbsp;";
     } else if (frequencyOption == "weekly") {
       frequency = $("#weekly-recurrent-freq").val();
       repeatingUnits = getWeeklyRepeatingDays();
-      repetitionString += "Repeating every " + frequency + " week";
-      if (frequency > 1) {
-        repetitionString += "s";
+      
+      if (frequency == 1) {
+        repetitionString += spanString + "week"
+      } else {
+        repetitionString += spanString + frequency + " weeks"
       }
-      repetitionString += " " + getWeeklyRepeatingString(repeatingUnits);
+      repetitionString +=
+        "</u>&nbsp;" + getWeeklyRepeatingString(repeatingUnits);
     } else if (frequencyOption == "monthly") {
       frequency = $("#monthly-recurrent-freq").val();
       repeatingUnits = getMonthlyRepeatingDays();
-      repetitionString += "Repeating every " + frequency + " month";
-      if (frequency > 1) {
-        repetitionString += "s";
+      
+      if (frequency == 1) {
+        repetitionString += spanString + " month";
+      } else {
+        repetitionString +=
+          spanString +
+          frequency +
+          " months"
       }
-      repetitionString += " " + getMonthlyRepeatingString(repeatingUnits);
+            repetitionString +=
+              "</u>&nbsp;" + getMonthlyRepeatingString(repeatingUnits);
     } else {
       // yearly
       frequency = $("#yearly-recurrent-freq").val();
       repeatingUnits = getYearlyRepeatingMonths();
-      repetitionString += "Repeating every " + frequency + " year";
-      if (frequency > 1) {
-        repetitionString += "s";
+      
+      
+      if (frequency == 1) {
+        repetitionString += spanString + "year";
+      } else {
+        repetitionString +=
+          spanString +
+          frequency +
+          " years"
       }
-      repetitionString += " " + getYearlyRepeatingString(repeatingUnits);
+      repetitionString +=
+        "</u>&nbsp;" + getYearlyRepeatingString(repeatingUnits);
     }
   }
 
-  var endDate = $("#recurrent-event-end-date").val();
-  repetitionString += "until " + endDate + ".";
-  eventString += "<br/>" + repetitionString;
+  var endDate = dayjs($("#recurrent-event-end-date").val()).format(
+    "MMMM D, YYYY"
+  );
+  repetitionString += "until&nbsp;" + spanString + endDate + "</u>.</div>";
+  eventString +=
+    "<div class = 'pt-3 row text-center justify-content-center'>" +
+    repetitionString;
   return eventString;
 }
 
