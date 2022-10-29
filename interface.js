@@ -390,12 +390,12 @@ $(function () {
             $("#recurrent-event-row").hide();
           }
         }
-
-        //check end repeat
-        if (!moreDaysRepeatStatus.neverEvendRepeat) {
           let eventEndDate = document.getElementById(
             "recurrent-event-end-date"
-          );
+          )
+        //check end repeat
+        if (!moreDaysRepeatStatus.neverEvendRepeat) {
+;
           if (moreDaysRepeatStatus.type != "none") {
             if (eventEndDate.value) {
               if (
@@ -424,7 +424,6 @@ $(function () {
             }
           }
         }
-
         if (!eventEndDate.value) {
           $("#recurrent-event-end-date").datepicker(
             "option",
@@ -454,13 +453,13 @@ $(function () {
         $("#event-end-time").timepicker("getTime") <
           $("#event-start-time").timepicker("getTime")
       ) {
-        /*
+        
         displayError("#event-end-time","event-start-time");
         $(this).show();
         $("#recurrent-event-row").hide();
         $("#recurrent-event-end-date-row").hide();
         $("#recurrent-event-content").hide();
-        hideCreateEventButton();*/
+        hideCreateEventButton();
       } else {
         if (
           $("#event-start-date").val() == $("#event-end-date").val() &&
