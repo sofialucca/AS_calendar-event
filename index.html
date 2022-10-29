@@ -10,6 +10,7 @@
 	<link rel="stylesheet" type="text/css" href="external_js/jquery.timepicker.css" />
     
 <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
     <script src="external_js/build/jquery.datetimepicker.full.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
@@ -26,9 +27,10 @@
 
 <body>
 <div id="container" >
-
+    
     <div id="content">
     <div class="card col-lg-6">
+        <h1>Events creator</h1>
         <input id="event-name" class="title col-md-12" type="text" placeholder="New Event Name">
         <div id ="location-div" class ="hidden-beginning">
             <input id="event-location" class="col-md-12" type="text" placeholder="Add Location">
@@ -72,13 +74,13 @@
                     <form class = "row" id = "form-recurrent-event-type" colspan="2">
                       
                         <div class = "col d-flex justify-content-around flex-column" class ="radio-recurrent">
-                    <input type="radio" name = "recurrent-event-type-selector" value = "none" checked = "checked" id = "none"/><label for="none">None</label>
-                    <input type="radio" name = "recurrent-event-type-selector" value = "day" id = "day"/><label for="day">Every Day</label>
-                    <input type="radio" name = "recurrent-event-type-selector" value = "week" id = "week" /><label for = "week">Every Week </label>                           
+                            <input type="radio" name = "recurrent-event-type-selector" value = "none" checked = "checked" id = "none"/><label for="none">None</label>
+                            <input type="radio" name = "recurrent-event-type-selector" value = "day" id = "day"/><label for="day">Daily</label>
+                            <input type="radio" name = "recurrent-event-type-selector" value = "week" id = "week" /><label for = "week">Weekly</label>                           
                         </div>
                         <div class = "col d-flex justify-content-around flex-column" class ="radio-recurrent">
-                            <input type="radio" name = "recurrent-event-type-selector" value = "month" id="month" /><label for = "month">Every Month</label>
-                            <input type="radio" name = "recurrent-event-type-selector" value = "year" id = "year" /><label for = "year">Every Year</label>
+                            <input type="radio" name = "recurrent-event-type-selector" value = "month" id="month" /><label for = "month">Monthly</label>
+                            <input type="radio" name = "recurrent-event-type-selector" value = "year" id = "year" /><label for = "year">Yearly</label>
                             <input type="radio" name = "recurrent-event-type-selector" value = "custom" id = "custom" /><label for = "custom">Custom</label>                            
                         </div>
 
@@ -89,7 +91,10 @@
             </tr>
             <tr id="recurrent-event-end-date-row" class="hidden hidden-beginning">
                 <td class="time-detail-name">end repeat:</td>
-                <td class=""><input class="input-medium search-query" onkeypress="return false" id="recurrent-event-end-date" type="text" placeholder="End date"></div></td>
+                <td class="recurrent-event-end-date-container"><input class="input-medium search-query" onkeypress="return false" id="recurrent-event-end-date" type="text" placeholder="End date"></td>
+                                <td class="never-end-repeat-selector">
+                    <input id="never-end-repeat-checkbox" type="checkbox"><label for ="never-end-repeat-checkbox">Never</label>
+                </td>
             </tr>
             <tr id = "error-message">
                 <td></td>
@@ -278,10 +283,36 @@
 
 
     <div class="card col-lg-4 ">
-        <button id="create-event-button" class="hidden-beginning btn btn-secondary class " type="button">Create Event</button>
+        <button id="create-event-button" class="hidden-beginning btn btn-secondary " type = "button">Create Event</button>
     </div>
 
-    <div id="new-event-text" class=" card col-lg-4">
+    <div id="new-event-text" class="hidden card col-lg-6 ">
+        <div class="line"></div>
+        <div id = "all-events-header" class = "row">
+            <div class = "col-7 align-self-center text-right">
+            <span class = "align-self-center hidden font-weight-bold text-right" id = "title-my-events" >
+                My events
+            </span>                
+        </div>
+
+            <div class = "col-5 d-block d-flex justify-content-end" id = "btns-all-events">
+                <button class = "btn btn-outline-primary btn-block" id = "btn-show-all-events" onclick="showAllEvents()">
+                    <i class="bi bi-eye-fill"></i>
+                </button>   
+                <button class = "btn btn-outline-secondary btn-block" id = "btn-hide-all-events" onclick= "hideAllEvents()">
+                    <i class="bi bi-eye-slash"></i>
+                </button>       
+                <button class = "btn btn-outline-danger btn-block" id = "btn-delete-all-events" onclick="deleteAllEvents()">
+                    <i class="bi bi-trash3"></i>
+                </button> 
+                    
+            </div>            
+        </div>
+        <div class="line hidden line-shrink"></div>
+
+
+
+        
         
     </div>
     </div>

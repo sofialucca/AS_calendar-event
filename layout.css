@@ -1,26 +1,35 @@
+
 ::-webkit-input-placeholder { /* Chrome/Opera/Safari */
     font: 12pt Helvetica;
+    font-variant: small-caps;
 }
 ::-moz-placeholder { /* Firefox 19+ */
     font: 12pt Helvetica;
+    font-variant: small-caps;
 }
 :-ms-input-placeholder { /* IE 10+ */
     font: 12pt Helvetica;
+    font-variant: small-caps;
 }
 :-moz-placeholder { /* Firefox 18- */
     font: 12pt Helvetica;
+    font-variant: small-caps;
 }
 .title::-webkit-input-placeholder { /* Chrome/Opera/Safari */
     font: 18pt Helvetica;
+    font-variant: small-caps;
 }
 .title::-moz-placeholder { /* Firefox 19+ */
     font: 18pt Helvetica;
+    font-variant: small-caps;
 }
 .title:-ms-input-placeholder { /* IE 10+ */
     font: 18pt Helvetica;
+    font-variant: small-caps;
 }
 .title:-moz-placeholder { /* Firefox 18- */
     font: 18pt Helvetica;
+    font-variant: small-caps;
 }
 
 body,
@@ -73,16 +82,32 @@ input,
     width: 100%;
 }
 
-.correct-event {
-    border: 0.15rem solid green !important;
-    align-content: center;
-    
-}
+
 .correct-event div{
     text-align: center;
-    margin:auto
-}
 
+}
+.event-container {
+    border: 0.15rem solid rgb(0, 0, 129) !important;
+    align-content: center;
+    padding:2rem;
+    padding-top: 0rem;
+    margin: auto;
+    margin-bottom: 0.55rem;
+    
+    
+}
+.event-container .div-single-event-btns{
+   padding-right: 0.25rem;
+   margin-top: -0.2rem;
+    
+}
+#new-event-text button{
+    width:fit-content !important;
+    margin-bottom:0.25rem;
+    align-self:flex-end;
+    margin-left: 0.25rem;
+}
 input[type="text"]#event-name, input[type="text"]#event-location {
     border: none;
 }
@@ -122,7 +147,10 @@ input[type="text"].title {
 .checkboxes {
     padding-top: 5px;
 }
-.checkbox-selector input, .month-checkbox-selector input {  
+.checkbox-selector input, .month-checkbox-selector input ,
+#form-recurrent-event-type input[type=radio],
+.all-day-selector input[type=checkbox],
+.never-end-repeat-selector input[type=checkbox]{  
     display: none !important;
 }
 .checkbox-selector input[type=checkbox] + label{
@@ -136,6 +164,9 @@ input[type="text"].title {
     text-align: center;
     cursor: pointer;
 }
+button{
+    cursor: pointer;
+}
 .month-checkbox-selector input[type=checkbox] + label{
     display: inline-block;
     border-radius: 6px;
@@ -147,19 +178,26 @@ input[type="text"].title {
     text-align: center;
     cursor: pointer;
 }
-.checkbox-selector input[type=checkbox]:checked + label, .month-checkbox-selector input[type=checkbox]:checked + label {
-    background: #2AD705;
+.checkbox-selector input[type=checkbox]:checked + label, .month-checkbox-selector input[type=checkbox]:checked + label,
+#form-recurrent-event-type :checked+label,
+.all-day-selector input[type=checkbox]:checked + label,  
+.never-end-repeat-selector input[type=checkbox]:checked + label{
+    background: rgb(0, 0, 129) ;
     color: #ffffff;
 }
-#form-recurrent-event-type input[type=radio],
-.all-day-selector input[type=checkbox]{
-   display: none!important; 
-   
+
+h1{
+    text-align: center;
+    font-variant: small-caps;
+    color: rgb(0, 0, 129) !important;
+    padding-bottom: 1rem;
+    font-weight: bold !important;
 }
 
 .radio-recurrent input[type=radio],
 #form-recurrent-event-type label,
-.all-day-selector input[type=checkbox] + label
+.all-day-selector input[type=checkbox] + label,
+.never-end-repeat-selector input[type=checkbox] + label
 {
   display: inline-block;
   border-radius: 6px;
@@ -172,10 +210,52 @@ input[type="text"].title {
   cursor: pointer;
   
 }
-
-#form-recurrent-event-type :checked+label,
-.all-day-selector input[type=checkbox]:checked + label {
-  background: #2AD705;
-  color: #ffffff;
+.all-day-selector input[type=checkbox] + label,
+.never-end-repeat-selector input[type=checkbox] + label{
+    padding: 0rem 2rem;
 }
 
+#btn-show-all-events,
+button.btn-show-single-event,
+#new-event-text,
+div.info-event-header{
+    display: none ;
+
+}
+
+#btn-hide-all-events,
+button.btn-hide-single-event{
+    color:rgb(58, 58, 58) ;
+    border: 1px solid rgb(58, 58, 58) ;
+}
+#btn-hide-all-events:hover,
+button.btn-hide-single-event:hover,
+#btn-hide-all-events:focus,
+button.btn-hide-single-event:focus,
+#btn-hide-all-events:active,
+button.btn-hide-single-event:active{
+     background-color:rgb(58, 58, 58) ;
+    border: 1px solid white ;   
+    color: white;
+}
+body,
+label,
+#create-event-button,
+option,select,
+input[type='text']{
+    font-variant: small-caps !important;
+}
+#all-events-header{
+    text-align: right;
+    
+    /*margin-right: 0rem !important;*/
+}
+#title-my-events{
+    margin-right: 0.5rem;
+    font-size: larger;
+}
+/*
+#all-events-header{
+    margin-right: 0.9rem;
+    padding-left: 0.9rem;
+}*/

@@ -2,10 +2,11 @@
 // An event is displayed as a sentence below the event creation dialogue
 // with the details of the event in readable English.
 
+//const dayjs = require("dayjs");
+
 /////////////////////////////////////////////////////////////////////////////
 // New Event Creation
 /////////////////////////////////////////////////////////////////////////////
-//const dayjs = require("dayjs");
 let spanString = "<u class = 'info-event font-weight-bold'>";
 let errorType = {};
 $(function () {
@@ -20,26 +21,30 @@ $(function () {
               keyValues.frequencyRecurrency = $(
                 "#recurrent-event-time-selector"
               ).val();
-          }      
+          }  
       $("#create-event-button").trigger("log", [
         "display-event-created",
         keyValues
       ]);
 
+
       correctFinalDateTime = true;
       wasEmpty = true;
       allDayRepeatStatus = new RepeatEvent(false);
       moreDaysRepeatStatus = new RepeatEvent(true);
-      $("input").val("");
+      $("input[type='text']").val("");
       resetAllRecurrentEventDetails();
-      $("#form-recurrent-event-type :checked").val("none");
+      $("#form-recurrent-event-type :checked").prop("checked", false);
+      $("#none").prop("checked", true);
       $("#all-day-event-checkbox").prop("checked", false);
 
       $(".hidden-beginning").hide();
       $("#event-name").focus();
-      
+    
     }
   });
+
+
 });
 
 // End time must come after start time
@@ -68,7 +73,7 @@ function isValidEndTime() {
 function checkInputs() {
   if ($("#event-name").val() == "") {
     writeEventToScreen(
-      "Need a name for the event",
+      "<div class = 'display-error'>Need a name for the event</div>",
       "display-error",
       "correct-event"
     );
@@ -76,7 +81,7 @@ function checkInputs() {
   }
   if (!isValidEndTime()) {
     writeEventToScreen(
-      "End date must come after start date.",
+      "<div class = 'display-error'>End date must come after start date.</div>",
       "display-error",
       "correct-event"
     );
@@ -89,7 +94,7 @@ function checkInputs() {
 
   if (!$.isNumeric(frequency)) {
     writeEventToScreen(
-      "Frequency must be a numeric value.",
+      "<div class = 'display-error'>Frequency must be a numeric value.</div>",
       "display-error",
       "correct-event"
     );
@@ -257,10 +262,33 @@ function getYearlyRepeatingString(arr) {
 function getEventText() {
   var eventName = $("#event-name").val();
   var eventLocation = $("#event-location").val();
-
+  var id = dayjs();
 
   var eventString =
-    "<div class = 'row text-center justify-content-center'>Event created:&nbsp;" +
+    "<div class = 'event-container col-6 d-flex flex-column' id = " +
+    id +
+    ">" +
+    "<div class = 'd-flex flex-row justify-content-end container-header'>" +
+    "<u class = 'info-event-header align-self-center'>" +
+    eventName +
+    "</u>" +
+    "<div class = 'row d-flex justify-content-end div-single-event-btns'>" +
+    "<button class = 'btn btn-outline-primary btn-block btn-show-single-event' onclick = 'showEvent(" +
+    id +
+    ")'>" +
+    "<i class='bi bi-eye-fill'></i>" +
+    "</button> " +
+    "<button class = 'btn btn-outline-primary btn-block btn-hide-single-event' onclick= 'hideEvent(" +
+    id +
+    ")'>" +
+    "<i class='bi bi-eye-slash'></i>" +
+    " </button>" +
+    "<button class='btn btn-outline-danger btn-block btn-delete-single-event'onclick= 'deleteEvent(" +
+    id +
+    ")'>" +
+    "<i class = 'bi bi-trash3'></i></button>" +
+    "</div></div>" +
+    "<div class = 'row text-center justify-content-center'> Event:&nbsp;" +
     spanString +
     eventName +
     "</u></div>";
@@ -374,19 +402,84 @@ function getEventText() {
         "</u>&nbsp;" + getYearlyRepeatingString(repeatingUnits);
     }
   }
-
-  var endDate = dayjs($("#recurrent-event-end-date").val()).format(
-    "MMMM D, YYYY"
-  );
-  repetitionString += "until&nbsp;" + spanString + endDate + "</u>.</div>";
+  if (!$("#never-end-repeat-checkbox")[0].checked){
+    var endDate = dayjs($("#recurrent-event-end-date").val()).format(
+      "MMMM D, YYYY"
+    );
+  repetitionString += "until&nbsp;" + spanString + endDate + "</u>"
+  }
+  repetitionString+=".</div>";
   eventString +=
     "<div class = 'pt-3 row text-center justify-content-center'>" +
-    repetitionString;
+    repetitionString+"</div>";
   return eventString;
 }
 
 function writeEventToScreen(eventString, newClass, toRemove) {
-  $("#new-event-text").html(eventString);
+  //document.getElementById("btns-all-events").insertAdjacentHTML("afterend",eventString)
+    document
+      .getElementById("all-events-header")
+      .insertAdjacentHTML("afterend", eventString);
+
+  if(newClass == "display-error"){
+    $("#btns-all-events").hide();
+  }else{
+    document.getElementById("new-event-text").classList.add(newClass);
+  }
   document.getElementById("new-event-text").classList.remove(toRemove);
-  document.getElementById("new-event-text").classList.add(newClass);
+  
+  $("#new-event-text").show();
+  $(".info-event-header").first().hide();
+  showAllEvents();
+}
+function hideAllEvents(){
+      
+       $("#btn-hide-all-events").hide();
+       $("#btn-show-all-events").show();
+       $(".event-container").removeClass("d-flex");
+       $(".event-container").hide(); 
+$(".line-shrink").show()
+       $("#title-my-events").show();
+}
+function showAllEvents(){
+      $("#btn-hide-all-events").show();
+      $("#btn-show-all-events").hide();
+      $(".event-container").addClass("d-flex");
+      $(".event-container").show();
+      $("#title-my-events").hide();
+      $(".line-shrink").hide();
+}
+
+function deleteAllEvents(){
+      $(".event-container").remove();
+      $("#new-event-text").hide();
+      $("#event-name").focus();
+}
+
+function hideEvent(id){
+  $("#"+id + " .info-event-header").show();
+  $("#"+id+" div.justify-content-center").hide();
+  $("#" + id + " button.btn-show-single-event").removeClass("d-none");
+  $("#" + id + " button.btn-show-single-event").show()
+    $("#" + id + " button.btn-hide-single-event").hide();
+    $("#"+id+" .container-header").removeClass("justify-content-end");
+    $("#" + id + " .container-header").addClass("justify-content-between");
+     $("#"+id+" .info-event-header").show();
+  document.getElementById(id).style.paddingBottom = 0;
+}
+
+function showEvent(id){
+  $("#"+id+" div.justify-content-center").show();
+    $("#" + id + " .container-header").addClass("justify-content-end");
+    $("#" + id + " .container-header").removeClass("justify-content-between");
+  $("#" + id + " button.btn-show-single-event").hide()
+    $("#" + id + " button.btn-hide-single-event").show();
+     $("#"+id+" .info-event-header").hide();
+  document.getElementById(id).style.paddingBottom = "2rem";
+}
+function deleteEvent(id) {
+  $("#" + id ).remove();
+  if($(".event-container").length == 0){
+    $("#new-event-text").hide();
+  }
 }
