@@ -373,7 +373,39 @@ $(function () {
           $("#event-end-time").timepicker("option", "minTime", "12:00 AM");
           if ($("#event-end-time").timepicker("getTime")) {
             $("#recurrent-event-row").show();
-            if ($("#form-recurrent-event-type :checked").val() != "none") {
+                          if (
+                            $("#form-recurrent-event-type :checked").val() !=
+                            "none"
+                          ) {
+                            $("#recurrent-event-end-date-row").show();
+                            if (moreDaysRepeatStatus.neverEvendRepeat) {
+                              $(".recurrent-event-end-date-container").hide();
+                              if (
+                                $(
+                                  "#form-recurrent-event-type :checked"
+                                ).val() == "custom"
+                              ) {
+                                showRecurrentEventOptions();
+                              } else {
+                                showCreateEventButton();
+                              }
+                            } else {
+                              $(".recurrent-event-end-date-container").show();
+                              if (!moreDaysRepeatStatus.correct) {
+                                displayErrorEndRepeat();
+                              } else if (
+                                $("#recurrent-event-end-date").val() &&
+                                $(
+                                  "#form-recurrent-event-type :checked"
+                                ).val() == "custom"
+                              ) {
+                                showRecurrentEventOptions();
+                              } else if ($("#recurrent-event-end-date").val()) {
+                                showCreateEventButton();
+                              }
+                            }
+                          }
+            /*if ($("#form-recurrent-event-type :checked").val() != "none") {
               $("#recurrent-event-end-date-row").show();
               if (!moreDaysRepeatStatus.correct) {
                 displayErrorEndRepeat();
@@ -385,17 +417,14 @@ $(function () {
               } else if ($("#recurrent-event-end-date").val()) {
                 showCreateEventButton();
               }
-            }
+            }*/
           } else {
             $("#recurrent-event-row").hide();
           }
         }
-          let eventEndDate = document.getElementById(
-            "recurrent-event-end-date"
-          )
+        let eventEndDate = document.getElementById("recurrent-event-end-date");
         //check end repeat
         if (!moreDaysRepeatStatus.neverEvendRepeat) {
-;
           if (moreDaysRepeatStatus.type != "none") {
             if (eventEndDate.value) {
               if (
@@ -430,6 +459,9 @@ $(function () {
             "minDate",
             $input.target.value
           );
+          if (moreDaysRepeatStatus.correct) {
+            moreDaysRepeatStatus.minDateCurrent = $input.target.value;
+          }
         }
       }
     });
@@ -453,8 +485,7 @@ $(function () {
         $("#event-end-time").timepicker("getTime") <
           $("#event-start-time").timepicker("getTime")
       ) {
-        
-        displayError("#event-end-time","event-start-time");
+        displayError("#event-end-time", "event-start-time");
         $(this).show();
         $("#recurrent-event-row").hide();
         $("#recurrent-event-end-date-row").hide();
@@ -470,6 +501,10 @@ $(function () {
         }
         if ($("#event-end-time").timepicker("getTime")) {
           $("#recurrent-event-row").show();
+          let eventEndDate = document.getElementById(
+            "recurrent-event-end-date"
+          );
+
           if ($("#form-recurrent-event-type :checked").val() != "none") {
             $("#recurrent-event-end-date-row").show();
             if ($("#never-end-repeat")[0].checked) {
@@ -481,22 +516,21 @@ $(function () {
               }
             } else {
               $(".recurrent-event-end-date-container").show();
-              if (eventEndDate.value && allDayRepeatStatus.type != "none") {
+              if (eventEndDate.value && moreDaysRepeatStatus.type != "none") {
                 if (
                   new Date($input.target.value) >
                   $("#recurrent-event-end-date").datepicker("getDate")
                 ) {
-                  displayErrorEndRepeat("#all-day-event-date");
-                  allDayRepeatStatus.correct = false;
+                  displayErrorEndRepeat("#event-end-date");
+                  moreDaysRepeatStatus.correct = false;
                 } else {
                   removeErrorEndRepeat(
-                    $("#all-day-event-date").datepicker("getDate"),
-                    "#all-day-event-date"
+                    $("#event-end-date").datepicker("getDate"),
+                    "#event-end-date"
                   );
-                  allDayRepeatStatus.minDateCurrent = $(
-                    "#all-day-event-date"
-                  ).datepicker("getDate");
-                  allDayRepeatStatus.correct = true;
+                  moreDaysRepeatStatus.minDateCurrent =
+                    $("#event-end-date").datepicker("getDate");
+                  moreDaysRepeatStatus.correct = true;
                 }
               } else {
                 $("#recurrent-event-end-date").datepicker(
@@ -504,10 +538,10 @@ $(function () {
                   "minDate",
                   $input.target.value
                 );
-                allDayRepeatStatus.minDateCurrent = $input.target.value;
-                allDayRepeatStatus.correct = true;
+                moreDaysRepeatStatus.minDateCurrent = $input.target.value;
+                moreDaysRepeatStatus.correct = true;
                 if (eventEndDate) {
-                  if (allDayRepeatStatus.type == "custom") {
+                  if (moreDaysRepeatStatus.type == "custom") {
                     showRecurrentEventOptions();
                   } else {
                     showCreateEventButton();
@@ -544,38 +578,76 @@ $(function () {
       } else {
         $("#recurrent-event-row").show();
         let eventEndDate = document.getElementById("recurrent-event-end-date");
+
         if ($("#form-recurrent-event-type :checked").val() != "none") {
           $("#recurrent-event-end-date-row").show();
+          if (allDayRepeatStatus.neverEvendRepeat) {
+            $(".recurrent-event-end-date-container").hide();
+            if ($("#form-recurrent-event-type :checked").val() == "custom") {
+              showRecurrentEventOptions();
+            } else {
+              showCreateEventButton();
+            }
+            if (!eventEndDate.value) {
+              $("#recurrent-event-end-date").datepicker(
+                "option",
+                "minDate",
+                $input.target.value
+              );
+              allDayRepeatStatus.minDateCurrent = $input.target.value;
+              allDayRepeatStatus.correct = true;
+            }
+          } else {
+            $(".recurrent-event-end-date-container").show();
+
+            if (eventEndDate.value && allDayRepeatStatus.type != "none") {
+              if (
+                new Date($input.target.value) >
+                $("#recurrent-event-end-date").datepicker("getDate")
+              ) {
+                displayErrorEndRepeat("#all-day-event-date");
+                allDayRepeatStatus.correct = false;
+              } else {
+                removeErrorEndRepeat(
+                  $("#all-day-event-date").datepicker("getDate"),
+                  "#all-day-event-date"
+                );
+                allDayRepeatStatus.minDateCurrent = $(
+                  "#all-day-event-date"
+                ).datepicker("getDate");
+                allDayRepeatStatus.correct = true;
+              }
+            } else {
+              $("#recurrent-event-end-date").datepicker(
+                "option",
+                "minDate",
+                $input.target.value
+              );
+              allDayRepeatStatus.minDateCurrent = $input.target.value;
+              allDayRepeatStatus.correct = true;
+              if (eventEndDate) {
+                if (allDayRepeatStatus.type == "custom") {
+                  showRecurrentEventOptions();
+                } else {
+                  showCreateEventButton();
+                }
+              }
+            }
+          }
         } else {
           $("#recurrent-event-end-date-row").hide();
           showCreateEventButton();
         }
 
-        if (eventEndDate.value && allDayRepeatStatus.type != "none") {
-          if (
-            new Date($input.target.value) >
-            $("#recurrent-event-end-date").datepicker("getDate")
-          ) {
-            displayErrorEndRepeat("#all-day-event-date");
-            allDayRepeatStatus.correct = false;
-          } else {
-            removeErrorEndRepeat(
-              $("#all-day-event-date").datepicker("getDate"),
-              "#all-day-event-date"
-            );
-            allDayRepeatStatus.minDateCurrent = $(
-              "#all-day-event-date"
-            ).datepicker("getDate");
-            allDayRepeatStatus.correct = true;
-          }
-        } else {
+        if (!eventEndDate.value) {
           $("#recurrent-event-end-date").datepicker(
             "option",
             "minDate",
             $input.target.value
           );
-          allDayRepeatStatus.minDateCurrent = $input.target.value;
-          allDayRepeatStatus.correct = true;
+          if (allDayRepeatStatus.correct) {
+            allDayRepeatStatus.minDateCurrent = $input.target.value;
+          }
         }
       }
     });
@@ -614,26 +686,85 @@ $(function () {
       hideCreateEventButton();
       hideRecurrentEventOptions();
       hideRecurrentDetails();
-      let correct;
+      $(".recurrent-event-end-date-container").show();
       if (allDayRepeatStatus.active) {
         allDayRepeatStatus.neverEvendRepeat = false;
-        correct = allDayRepeatStatus.correct;
+        if ($("#recurrent-event-end-date").val()) {
+          if (
+            new Date($("#all-day-event-date").val()) <=
+            new Date($("#recurrent-event-end-date").val())
+          ) {
+            if (!allDayRepeatStatus.correct) {
+              removeErrorEndRepeat(
+                $("#event-end-date").val(),
+                "#event-end-date"
+              );
+              allDayRepeatStatus.correct = true;
+            }
+            $("#recurrent-event-end-date").datepicker(
+              "option",
+              "minDate",
+              $input.target.value
+            );
+            allDayRepeatStatus.minDateCurrent = $("#all-day-event-date").val();
+
+            if ($("#form-recurrent-event-type :checked").val() != "custom") {
+              showCreateEventButton();
+            } else {
+              showRecurrentEventOptions();
+            }
+          } else {
+            displayErrorEndRepeat("#all-day-event-date");
+            allDayRepeatStatus.correct = false;
+          }
+        } else {
+          $("#recurrent-event-end-date").datepicker(
+            "option",
+            "minDate",
+            $input.target.value
+          );
+          allDayRepeatStatus.minDateCurrent = $("#all-day-event-date").val();
+        }
       } else {
         moreDaysRepeatStatus.neverEvendRepeat = false;
-        correct = moreDaysRepeatStatus.correct;
-      }
-      $(".recurrent-event-end-date-container").show();
-      if (!correct) {
-        $("#error-message-end-repeat").show();
-      } else {
         if ($("#recurrent-event-end-date").val()) {
-          if ($("#form-recurrent-event-type :checked").val() != "custom") {
-            showCreateEventButton();
+          if (
+            new Date($("#event-end-date").val()) <=
+            new Date($("#recurrent-event-end-date").val())
+          ) {
+            if (!moreDaysRepeatStatus.correct) {
+              removeErrorEndRepeat(
+                $("#event-end-date").val(),
+                "#event-end-date"
+              );
+              moreDaysRepeatStatus.correct = true;
+            }
+            $("#recurrent-event-end-date").datepicker(
+              "option",
+              "minDate",
+              $input.target.value
+            );
+            moreDaysRepeatStatus.minDateCurrent = $("#event-end-date").val();
+
+            if ($("#form-recurrent-event-type :checked").val() != "custom") {
+              showCreateEventButton();
+            } else {
+              showRecurrentEventOptions();
+            }
           } else {
-            showRecurrentEventOptions();
+            displayErrorEndRepeat("#event-end-date");
+            moreDaysRepeatStatus.correct = false;
           }
+        } else {
+          $("#recurrent-event-end-date").datepicker(
+            "option",
+            "minDate",
+            $input.target.value
+          );
+          moreDaysRepeatStatus.minDateCurrent = $("#all-day-event-date").val();
         }
       }
+      
     }
   });
   $("#form-recurrent-event-type").on("change", function () {
@@ -1078,11 +1209,12 @@ function hideAllDayEventOptions() {
   );
   $("#form-recurrent-event-type :checked").prop("checked", false);
   $("#never-end-repeat-checkbox").prop(
-    "checked"
-    //moreDaysRepeatStatus.neverEvendRepeat
+    "checked",
+    moreDaysRepeatStatus.neverEvendRepeat
   );
   $("#" + moreDaysRepeatStatus.type).prop("checked", true);
   $("#recurrent-event-end-date").val(moreDaysRepeatStatus.endDate);
+
   $("#recurrent-event-time-selector").val(moreDaysRepeatStatus.frequencyType);
   $("#" + moreDaysRepeatStatus.frequencyType + "-recurrent-freq").val(
     moreDaysRepeatStatus.frequency
@@ -1104,6 +1236,7 @@ function hideAllDayEventOptions() {
           $("#event-end-time").show();
           $("#recurrent-event-row").show();
           if ($("#form-recurrent-event-type :checked").val() != "none") {
+            $("#recurrent-event-end-date-row").show();
             if (moreDaysRepeatStatus.neverEvendRepeat) {
               $(".recurrent-event-end-date-container").hide();
               if ($("#form-recurrent-event-type :checked").val() == "custom") {
@@ -1126,11 +1259,14 @@ function hideAllDayEventOptions() {
               }
             }
           } else {
+            $("#recurrent-event-end-date-row").hide();
             showCreateEventButton();
           }
         } else {
           $("#recurrent-event-row").hide();
         }
+      } else {
+        $("#recurrent-event-row").hide();
       }
       if (!correctFinalDateTime) {
         $("#error-message").show();
@@ -1154,7 +1290,7 @@ function showRecurrentEventEndDetails() {
     }
   } else {
     $(".recurrent-event-end-date-container").show();
-/*      if ($("#recurrent-event-end-date").val() && currentState.correct) {
+    /*      if ($("#recurrent-event-end-date").val() && currentState.correct) {
         if ($("#form-recurrent-event-type :checked").val() == "custom") {
           showRecurrentEventOptions();
         } else {
